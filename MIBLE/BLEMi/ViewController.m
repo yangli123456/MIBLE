@@ -8,18 +8,18 @@
 
 #import "ViewController.h"
 
-//4个字节Bytes 转 int
+//4个字节Bytes转int
 unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
     unsigned int  intV;
-    intV = (unsigned int ) ( ((bytesValue[3] & 0xff)<<24)
+    intV = (unsigned int ) (((bytesValue[3] & 0xff)<<24)
                             |((bytesValue[2] & 0xff)<<16)
                             |((bytesValue[1] & 0xff)<<8)
                             |(bytesValue[0] & 0xff));
     return intV;
 }
 
-
 @interface ViewController ()
+
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activeID;
 @property (weak, nonatomic) IBOutlet UIButton *connectBtn;
 @property (weak, nonatomic) IBOutlet UITextView *resultTextV;
@@ -28,6 +28,7 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
 
 @implementation ViewController
 
+//停止震动
 - (IBAction)stopShakeAction:(id)sender {
     if (thePerpher && theSakeCC) {
         Byte zd[1] = {0};
@@ -70,10 +71,7 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
         [self.activeID startAnimating];
         self.connectBtn.enabled = NO;
         self.resultTextV.text = @"";
-
     }
-
-    
 }
 
 - (void)viewDidLoad {
@@ -81,7 +79,6 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
 
     theManager = [[CBCentralManager alloc]initWithDelegate:self queue:nil];
     self.connectBtn.enabled = NO;
-
 }
 
 #pragma mark -当前蓝牙主设备状态
@@ -114,24 +111,21 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
                 break;
         }
     }
-    
-    
-    
 }
+
 //扫描到设备会进入方法
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI{
     NSLog(@"扫描连接外设：%@ %@",peripheral.name,RSSI);
     [central connectPeripheral:peripheral options:nil];
-    if ([peripheral.name hasSuffix:@"MI"]) {
+    if ([peripheral.name hasSuffix:@"iPhone"]) {
         thePerpher = peripheral;
         [central stopScan];
         [central connectPeripheral:peripheral options:nil];
         self.title = @"发现小米手环，开始连接...";
         self.resultTextV.text = [NSString stringWithFormat:@"发现手环：%@\n名称：%@\n",peripheral.identifier.UUIDString,peripheral.name];
     }
-    
-    
 }
+
 #pragma mark 设备扫描与连接的代理
 //连接到Peripherals-成功
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -150,7 +144,6 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
     [self.activeID stopAnimating];
     self.title = @"连接失败";
     self.connectBtn.enabled = YES;
-    
 }
 
 //扫描到服务
@@ -211,13 +204,8 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
             {
                 [peripheral readValueForCharacteristic:characteristic];
             }
-            
-            
-            
         }
     }
-    
-    
 }
 
 
@@ -251,8 +239,7 @@ unsigned int  TCcbytesValueToInt(Byte *bytesValue) {
         //这里解析infoByts得到设备信息
         
     }
-    
-    
+
     [self.activeID stopAnimating];
     self.connectBtn.enabled = YES;
     self.title = @"信息扫描完成";
